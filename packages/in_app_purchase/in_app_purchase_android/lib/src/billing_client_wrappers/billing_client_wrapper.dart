@@ -136,6 +136,7 @@ class BillingClient {
   /// [SkuDetailsResponseWrapper]. It also takes the values of
   /// `SkuDetailsParams` as direct arguments instead of requiring it constructed
   /// and passed in as a class.
+  @Deprecated('Use queryProductDetailsAsync instead.')
   Future<SkuDetailsResponseWrapper> querySkuDetails(
       {required SkuType skuType, required List<String> skusList}) async {
     final Map<String, dynamic> arguments = <String, dynamic>{
@@ -600,4 +601,17 @@ class BillingClientFeatureConverter
   @override
   String toJson(BillingClientFeature object) =>
       _$BillingClientFeatureEnumMap[object]!;
+}
+
+/// https://developer.android.com/reference/com/android/billingclient/api/ProductDetails.RecurrenceMode
+@JsonEnum(alwaysCreate: true)
+enum RecurrenceMode {
+  @JsonValue(2)
+  finiteRecurring,
+
+  @JsonValue(1)
+  infiniteRecurring,
+
+  @JsonValue(3)
+  nonRecurring
 }
