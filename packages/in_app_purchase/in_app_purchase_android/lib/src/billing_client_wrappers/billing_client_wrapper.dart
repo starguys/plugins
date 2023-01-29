@@ -156,12 +156,12 @@ class BillingClient {
     required SkuType skuType,
   }) async {
     final Map<String, dynamic> arguments = <String, dynamic>{
-      'productIds': identifiers,
-      'productType': const SkuTypeConverter().toJson(skuType),
+      'skusList': identifiers.toList(),
+      'skuType': const SkuTypeConverter().toJson(skuType),
     };
     return ProductDetailsResponseWrapper.fromJson(
       await channel.invokeMapMethod<String, dynamic>(
-            'BillingClient#querySkuDetailsAsync(SkuDetailsParams, SkuDetailsResponseListener)',
+            'BillingClient#queryProductDetailsAsync(QueryProductDetailsParams, ProductDetailsResponseListener)',
             arguments,
           ) ??
           <String, dynamic>{},

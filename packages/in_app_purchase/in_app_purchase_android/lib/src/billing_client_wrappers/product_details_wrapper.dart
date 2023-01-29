@@ -105,7 +105,7 @@ class SubscriptionOfferDetails {
     required this.basePlanId,
     this.offerId,
     required this.offerTags,
-    required this.offerIdToken,
+    required this.offerToken,
     required this.pricingPhases,
   });
 
@@ -118,7 +118,7 @@ class SubscriptionOfferDetails {
 
   final List<String> offerTags;
 
-  final String offerIdToken;
+  final String offerToken;
 
   final List<PricingPhase> pricingPhases;
 
@@ -132,7 +132,7 @@ class SubscriptionOfferDetails {
         other.basePlanId == basePlanId &&
         other.offerId == offerId &&
         other.offerTags == offerTags &&
-        other.offerIdToken == offerIdToken &&
+        other.offerToken == offerToken &&
         other.pricingPhases == pricingPhases;
   }
 
@@ -141,7 +141,7 @@ class SubscriptionOfferDetails {
         basePlanId,
         offerId,
         offerTags,
-        offerIdToken,
+        offerToken,
         pricingPhases,
       );
 
@@ -151,7 +151,7 @@ class SubscriptionOfferDetails {
     $basePlanId,
     $offerId,
     ${offerTags.toString()}
-    $offerIdToken,
+    $offerToken,
     $pricingPhases,
 ''';
   }

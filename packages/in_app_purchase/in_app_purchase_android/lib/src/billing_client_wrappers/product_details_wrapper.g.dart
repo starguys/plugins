@@ -28,7 +28,7 @@ SubscriptionOfferDetails _$SubscriptionOfferDetailsFromJson(Map json) =>
       offerId: json['offerId'] as String?,
       offerTags:
           (json['offerTags'] as List<dynamic>).map((e) => e as String).toList(),
-      offerIdToken: json['offerIdToken'] as String,
+      offerToken: json['offerToken'] as String,
       pricingPhases: (json['pricingPhases'] as List<dynamic>)
           .map(
               (e) => PricingPhase.fromJson(Map<String, dynamic>.from(e as Map)))

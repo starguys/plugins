@@ -116,9 +116,9 @@ void main() {
 
   group('queryProductDetails', () {
     const String queryMethodName =
-        'BillingClient#queryProductDetailsAsync(SkuDetailsParams, SkuDetailsResponseListener)';
+        'BillingClient#queryProductDetailsAsync(QueryProductDetailsParams, ProductDetailsResponseListener)';
 
-    test('handles empty skuDetails', () async {
+    test('handles empty productDetails', () async {
       const String debugMessage = 'dummy message';
       const BillingResponse responseCode = BillingResponse.developerError;
       stubPlatform.addResponse(name: queryMethodName, value: <dynamic, dynamic>{
@@ -139,7 +139,7 @@ void main() {
       expect(response.productDetailsList, isEmpty);
     });
 
-    test('returns SkuDetailsResponseWrapper', () async {
+    test('returns ProductDetailsResponseWrapper', () async {
       const String debugMessage = 'dummy message';
       const BillingResponse responseCode = BillingResponse.ok;
       stubPlatform.addResponse(name: queryMethodName, value: <String, dynamic>{
@@ -166,13 +166,11 @@ void main() {
 
     test('handles null method channel response', () async {
       stubPlatform.addResponse(name: queryMethodName);
-
       final ProductDetailsResponseWrapper response =
           await billingClient.queryProductDetails(
         skuType: SkuType.inapp,
         identifiers: <String>{'invalid'},
       );
-
       const BillingResultWrapper billingResult = BillingResultWrapper(
           responseCode: BillingResponse.error,
           debugMessage: kInvalidBillingResultErrorMessage);

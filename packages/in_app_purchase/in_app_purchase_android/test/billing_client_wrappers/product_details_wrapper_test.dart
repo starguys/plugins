@@ -15,7 +15,7 @@ const ProductDetailsWrapper dummyProductDetails = ProductDetailsWrapper(
     SubscriptionOfferDetails(
       basePlanId: 'standard01',
       offerTags: <String>[],
-      offerIdToken:
+      offerToken:
           r'AUj\/YhhZsl3w+hlJe0LJU52xlM7vvVoYamwaKc8FNA71RIDbAECTXZGiCT2LnAJImpgt4sGQ6z5xr1OlBz0Ou2WgbOJyj3kqE4uhAgpAfjTUymZfQiNDlSpq8g==',
       pricingPhases: <PricingPhase>[
         PricingPhase(
@@ -149,7 +149,7 @@ void main() {
             basePlanId: 'standard01',
             offerId: 'standard0101',
             offerTags: <String>[],
-            offerIdToken:
+            offerToken:
                 r'AUj\/YhhMKE1Vxl+FP3Pw\/XDyFTV+RUyiOh6Gt7KXDzCOcJnPsYTszAPoaFQJ3skn1bJQXICBZkR6o7E4eKIHoU40Jvr1uA5QmnyEcEu+StUzO9M=',
             pricingPhases: <PricingPhase>[
               PricingPhase(
@@ -175,7 +175,7 @@ void main() {
             basePlanId: 'standard01',
             offerId: 'standard0101',
             offerTags: <String>[],
-            offerIdToken:
+            offerToken:
                 r'AUj\/YhhMKE1Vxl+FP3Pw\/XDyFTV+RUyiOh6Gt7KXDzCOcJnPsYTszAPoaFQJ3skn1bJQXICBZkR6o7E4eKIHoU40Jvr1uA5QmnyEcEu+StUzO9M=',
             pricingPhases: <PricingPhase>[
               PricingPhase(
@@ -217,7 +217,7 @@ Map<String, dynamic> buildProductMap(ProductDetailsWrapper original) {
     'productType': original.productType.name,
     'subscriptionOfferDetails': [
       {
-        'offerIdToken':
+        'offerToken':
             r'AUj\/YhhZsl3w+hlJe0LJU52xlM7vvVoYamwaKc8FNA71RIDbAECTXZGiCT2LnAJImpgt4sGQ6z5xr1OlBz0Ou2WgbOJyj3kqE4uhAgpAfjTUymZfQiNDlSpq8g==',
         'basePlanId': 'standard01',
         'pricingPhases': [
