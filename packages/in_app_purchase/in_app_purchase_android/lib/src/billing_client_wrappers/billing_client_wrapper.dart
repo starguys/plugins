@@ -10,6 +10,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 import '../../billing_client_wrappers.dart';
 import '../channel.dart';
+import 'product_details_wrapper.dart';
 
 part 'billing_client_wrapper.g.dart';
 
@@ -127,27 +128,44 @@ class BillingClient {
     return channel.invokeMethod<void>('BillingClient#endConnection()');
   }
 
-  /// Returns a list of [SkuDetailsWrapper]s that have [SkuDetailsWrapper.sku]
-  /// in `skusList`, and [SkuDetailsWrapper.type] matching `skuType`.
+  /// Returns a list of [ProductDetailsWrapper]s that have [ProductDetailsWrapper.sku]
+  /// in `skusList`, and [ProductDetailsWrapper.type] matching `skuType`.
   ///
   /// Calls through to [`BillingClient#querySkuDetailsAsync(SkuDetailsParams,
   /// SkuDetailsResponseListener)`](https://developer.android.com/reference/com/android/billingclient/api/BillingClient#querySkuDetailsAsync(com.android.billingclient.api.SkuDetailsParams,%20com.android.billingclient.api.SkuDetailsResponseListener))
   /// Instead of taking a callback parameter, it returns a Future
-  /// [SkuDetailsResponseWrapper]. It also takes the values of
+  /// [ProductDetailsResponseWrapper]. It also takes the values of
   /// `SkuDetailsParams` as direct arguments instead of requiring it constructed
   /// and passed in as a class.
   @Deprecated('Use queryProductDetailsAsync instead.')
-  Future<SkuDetailsResponseWrapper> querySkuDetails(
+  Future<ProductDetailsResponseWrapper> querySkuDetails(
       {required SkuType skuType, required List<String> skusList}) async {
     final Map<String, dynamic> arguments = <String, dynamic>{
       'skuType': const SkuTypeConverter().toJson(skuType),
       'skusList': skusList
     };
-    return SkuDetailsResponseWrapper.fromJson((await channel.invokeMapMethod<
+    return ProductDetailsResponseWrapper.fromJson((await channel.invokeMapMethod<
                 String, dynamic>(
             'BillingClient#querySkuDetailsAsync(SkuDetailsParams, SkuDetailsResponseListener)',
             arguments)) ??
         <String, dynamic>{});
+  }
+
+  Future<ProductDetailsResponseWrapper> queryProductDetails({
+    required Set<String> identifiers,
+    required SkuType skuType,
+  }) async {
+    final Map<String, dynamic> arguments = <String, dynamic>{
+      'productIds': identifiers,
+      'productType': const SkuTypeConverter().toJson(skuType),
+    };
+    return ProductDetailsResponseWrapper.fromJson(
+      await channel.invokeMapMethod<String, dynamic>(
+            'BillingClient#querySkuDetailsAsync(SkuDetailsParams, SkuDetailsResponseListener)',
+            arguments,
+          ) ??
+          <String, dynamic>{},
+    );
   }
 
   /// Attempt to launch the Play Billing Flow for a given [skuDetails].
@@ -235,7 +253,7 @@ class BillingClient {
   /// Fetches purchase history for the given [SkuType].
   ///
   /// Unlike [queryPurchases], this makes a network request via Play and returns
-  /// the most recent purchase for each [SkuDetailsWrapper] of the given
+  /// the most recent purchase for each [ProductDetailsWrapper] of the given
   /// [SkuType] even if the item is no longer owned.
   ///
   /// All purchase information should also be verified manually, with your
@@ -443,7 +461,7 @@ class BillingResponseConverter implements JsonConverter<BillingResponse, int?> {
   int toJson(BillingResponse object) => _$BillingResponseEnumMap[object]!;
 }
 
-/// Enum representing potential [SkuDetailsWrapper.type]s.
+/// Enum representing potential [ProductDetailsWrapper.type]s.
 ///
 /// Wraps
 /// [`BillingClient.SkuType`](https://developer.android.com/reference/com/android/billingclient/api/BillingClient.SkuType)
