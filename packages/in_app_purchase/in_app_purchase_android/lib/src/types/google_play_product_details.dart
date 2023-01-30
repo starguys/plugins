@@ -5,6 +5,7 @@
 import 'package:in_app_purchase_platform_interface/in_app_purchase_platform_interface.dart';
 
 import '../../billing_client_wrappers.dart';
+import '../billing_client_wrappers/product_details_wrapper.dart';
 
 /// The class represents the information of a product as registered in at
 /// Google Play store front.
@@ -18,7 +19,7 @@ class GooglePlayProductDetails extends ProductDetails {
     required String price,
     required double rawPrice,
     required String currencyCode,
-    required this.skuDetails,
+    required this.productDetails,
     required String currencySymbol,
   }) : super(
           id: id,
@@ -31,23 +32,36 @@ class GooglePlayProductDetails extends ProductDetails {
         );
 
   /// Generate a [GooglePlayProductDetails] object based on an Android
-  /// [SkuDetailsWrapper] object.
-  factory GooglePlayProductDetails.fromSkuDetails(
-    SkuDetailsWrapper skuDetails,
+  /// [ProductDetailsWrapper] object.
+  factory GooglePlayProductDetails.fromProductDetails(
+    ProductDetailsWrapper productDetails,
   ) {
     return GooglePlayProductDetails(
-      id: skuDetails.sku,
-      title: skuDetails.title,
-      description: skuDetails.description,
-      price: skuDetails.price,
-      rawPrice: skuDetails.priceAmountMicros / 1000000.0,
-      currencyCode: skuDetails.priceCurrencyCode,
-      currencySymbol: skuDetails.priceCurrencySymbol,
-      skuDetails: skuDetails,
+      id: productDetails.productId,
+      title: productDetails.title,
+      description: productDetails.description,
+      price: productDetails.price ?? 'unknown',
+      rawPrice:
+          (productDetails.oneTimePurchaseOfferDetails?.priceAmountMicros ??
+                  productDetails.subscriptionOfferDetails?.first.pricingPhases
+                      .first.priceAmountMicros ??
+                  0) /
+              1000000.0,
+      currencyCode:
+          productDetails.oneTimePurchaseOfferDetails?.priceCurrencyCode ??
+              productDetails.subscriptionOfferDetails?.first.pricingPhases.first
+                  .priceCurrencyCode ??
+              'USD',
+      currencySymbol:
+          productDetails.oneTimePurchaseOfferDetails?.formattedPrice[0] ??
+              productDetails.subscriptionOfferDetails?.first.pricingPhases.first
+                  .formattedPrice[0] ??
+              r'$',
+      productDetails: productDetails,
     );
   }
 
-  /// Points back to the [SkuDetailsWrapper] object that was used to generate
+  /// Points back to the [ProductDetailsWrapper] object that was used to generate
   /// this [GooglePlayProductDetails] object.
-  final SkuDetailsWrapper skuDetails;
+  final ProductDetailsWrapper productDetails;
 }

@@ -95,7 +95,7 @@ class PurchaseWrapper {
   @JsonKey(defaultValue: 0)
   final int purchaseTime;
 
-  /// A unique ID for a given [SkuDetailsWrapper], user, and purchase.
+  /// A unique ID for a given [ProductDetailsWrapper], user, and purchase.
   @JsonKey(defaultValue: '')
   final String purchaseToken;
 
@@ -199,7 +199,7 @@ class PurchaseHistoryRecordWrapper {
   @JsonKey(defaultValue: 0)
   final int purchaseTime;
 
-  /// A unique ID for a given [SkuDetailsWrapper], user, and purchase.
+  /// A unique ID for a given [ProductDetailsWrapper], user, and purchase.
   @JsonKey(defaultValue: '')
   final String purchaseToken;
 

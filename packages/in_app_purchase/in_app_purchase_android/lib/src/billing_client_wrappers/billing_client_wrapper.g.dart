@@ -42,3 +42,9 @@ const _$BillingClientFeatureEnumMap = {
   BillingClientFeature.subscriptionsOnVR: 'subscriptionsOnVr',
   BillingClientFeature.subscriptionsUpdate: 'subscriptionsUpdate',
 };
+
+const _$RecurrenceModeEnumMap = {
+  RecurrenceMode.finiteRecurring: 2,
+  RecurrenceMode.infiniteRecurring: 1,
+  RecurrenceMode.nonRecurring: 3,
+};

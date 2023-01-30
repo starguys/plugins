@@ -3,5 +3,6 @@
 // found in the LICENSE file.
 
 export 'src/billing_client_wrappers/billing_client_wrapper.dart';
+export 'src/billing_client_wrappers/product_details_wrapper.dart';
 export 'src/billing_client_wrappers/purchase_wrapper.dart';
 export 'src/billing_client_wrappers/sku_details_wrapper.dart';

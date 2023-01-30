@@ -10,6 +10,7 @@ import 'package:in_app_purchase_platform_interface/in_app_purchase_platform_inte
 
 import '../billing_client_wrappers.dart';
 import '../in_app_purchase_android.dart';
+import 'billing_client_wrappers/product_details_wrapper.dart';
 
 /// [IAPError.code] code for failed purchases.
 const String kPurchaseErrorCode = 'purchase_error';
@@ -75,36 +76,70 @@ class InAppPurchaseAndroidPlatform extends InAppPurchasePlatform {
   @override
   Future<ProductDetailsResponse> queryProductDetails(
       Set<String> identifiers) async {
-    List<SkuDetailsResponseWrapper> responses;
+    // List<SkuDetailsResponseWrapper> responses;
+    List<ProductDetailsResponseWrapper> responses;
     PlatformException? exception;
     try {
-      responses = await Future.wait(<Future<SkuDetailsResponseWrapper>>[
-        billingClient.querySkuDetails(
-            skuType: SkuType.inapp, skusList: identifiers.toList()),
-        billingClient.querySkuDetails(
-            skuType: SkuType.subs, skusList: identifiers.toList())
+      responses = await Future.wait(<Future<ProductDetailsResponseWrapper>>[
+        billingClient.queryProductDetails(
+          identifiers: identifiers,
+          skuType: SkuType.inapp,
+        ),
+        billingClient.queryProductDetails(
+          identifiers: identifiers,
+          skuType: SkuType.subs,
+        ),
       ]);
+      // responses = await Future.wait(<Future<SkuDetailsResponseWrapper>>[
+      //   billingClient.querySkuDetails(
+      //       skuType: SkuType.inapp, skusList: identifiers.toList()),
+      //   billingClient.querySkuDetails(
+      //       skuType: SkuType.subs, skusList: identifiers.toList())
+      // ]);
     } on PlatformException catch (e) {
       exception = e;
-      responses = <SkuDetailsResponseWrapper>[
-        // ignore: invalid_use_of_visible_for_testing_member
-        SkuDetailsResponseWrapper(
-            billingResult: BillingResultWrapper(
-                responseCode: BillingResponse.error, debugMessage: e.code),
-            skuDetailsList: const <SkuDetailsWrapper>[]),
-        // ignore: invalid_use_of_visible_for_testing_member
-        SkuDetailsResponseWrapper(
-            billingResult: BillingResultWrapper(
-                responseCode: BillingResponse.error, debugMessage: e.code),
-            skuDetailsList: const <SkuDetailsWrapper>[])
+      // responses = <SkuDetailsResponseWrapper>[
+      //   // ignore: invalid_use_of_visible_for_testing_member
+      //   SkuDetailsResponseWrapper(
+      //       billingResult: BillingResultWrapper(
+      //           responseCode: BillingResponse.error, debugMessage: e.code),
+      //       skuDetailsList: const <SkuDetailsWrapper>[]),
+      //   // ignore: invalid_use_of_visible_for_testing_member
+      //   SkuDetailsResponseWrapper(
+      //       billingResult: BillingResultWrapper(
+      //           responseCode: BillingResponse.error, debugMessage: e.code),
+      //       skuDetailsList: const <SkuDetailsWrapper>[])
+      // ];
+
+      responses = <ProductDetailsResponseWrapper>[
+        ProductDetailsResponseWrapper(
+          billingResult: BillingResultWrapper(
+            responseCode: BillingResponse.error,
+            debugMessage: e.code,
+          ),
+          productDetailsList: const <ProductDetailsWrapper>[],
+        ),
+        ProductDetailsResponseWrapper(
+          billingResult: BillingResultWrapper(
+            responseCode: BillingResponse.error,
+            debugMessage: e.code,
+          ),
+          productDetailsList: const <ProductDetailsWrapper>[],
+        ),
       ];
     }
     final List<ProductDetails> productDetailsList =
-        responses.expand((SkuDetailsResponseWrapper response) {
-      return response.skuDetailsList;
-    }).map((SkuDetailsWrapper skuDetailWrapper) {
-      return GooglePlayProductDetails.fromSkuDetails(skuDetailWrapper);
+        responses.expand((ProductDetailsResponseWrapper response) {
+      return response.productDetailsList;
+    }).map((ProductDetailsWrapper productDetailsWrapper) {
+      return GooglePlayProductDetails.fromProductDetails(productDetailsWrapper);
     }).toList();
+
+    // responses.expand((SkuDetailsResponseWrapper response) {
+    //   return response.skuDetailsList;
+    // }).map((SkuDetailsWrapper skuDetailWrapper) {
+    //   return GooglePlayProductDetails.fromProductDetails(skuDetailWrapper);
+    // }).toList();
 
     final Set<String> successIDS = productDetailsList
         .map((ProductDetails productDetails) => productDetails.id)

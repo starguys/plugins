@@ -257,12 +257,15 @@ class _MyAppState extends State<_MyApp> {
                       final InAppPurchaseAndroidPlatformAddition addition =
                           InAppPurchasePlatformAddition.instance!
                               as InAppPurchaseAndroidPlatformAddition;
-                      final SkuDetailsWrapper skuDetails =
+                      // final SkuDetailsWrapper skuDetails =
+                      //     (productDetails as GooglePlayProductDetails)
+                      //         .skuDetails;
+                      final ProductDetailsWrapper productDetailsWrapper =
                           (productDetails as GooglePlayProductDetails)
-                              .skuDetails;
+                              .productDetails;
                       addition
                           .launchPriceChangeConfirmationFlow(
-                              sku: skuDetails.sku)
+                              sku: productDetailsWrapper.productId)
                           .then((BillingResultWrapper value) => print(
                               'confirmationResponse: ${value.responseCode}'));
                     },
