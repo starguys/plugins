@@ -293,37 +293,52 @@ class MethodCallHandlerImpl
             return;
         }
 
-//        if (accountId != null && !accountId.isEmpty()) {
-//            paramsBuilder.setObfuscatedAccountId(accountId);
-//        }
-//        if (obfuscatedProfileId != null && !obfuscatedProfileId.isEmpty()) {
-//            paramsBuilder.setObfuscatedProfileId(obfuscatedProfileId);
-//        }
-//        BillingFlowParams.SubscriptionUpdateParams.Builder subscriptionUpdateParamsBuilder = BillingFlowParams.SubscriptionUpdateParams
-//                .newBuilder();
-//        if (oldSku != null && !oldSku.isEmpty() && purchaseToken != null) {
-//            subscriptionUpdateParamsBuilder.setOldPurchaseToken(purchaseToken);
-//            // The proration mode value has to match one of the following declared in
-//            // https://developer.android.com/reference/com/android/billingclient/api/BillingFlowParams.ProrationMode
-//            subscriptionUpdateParamsBuilder.setReplaceProrationMode(prorationMode);
-//            paramsBuilder.setSubscriptionUpdateParams(subscriptionUpdateParamsBuilder.build());
-//        }
-        assert !(productDetails.getSubscriptionOfferDetails().isEmpty());
-        final String offerToken = productDetails.getSubscriptionOfferDetails().get(selectedOfferIndex).getOfferToken();
-        final ImmutableList<BillingFlowParams.ProductDetailsParams> productDetailsParamsList = ImmutableList.of(
-                BillingFlowParams.ProductDetailsParams.newBuilder()
-                        .setProductDetails(productDetails)
-                        .setOfferToken(offerToken)
-                        .build()
-        );
-        final BillingFlowParams billingFlowParams = BillingFlowParams.newBuilder()
-                .setProductDetailsParamsList(productDetailsParamsList)
-                .build();
+        final BillingFlowParams.Builder billingFlowParamsBuilder = BillingFlowParams.newBuilder();
+
+        if (productDetails.getSubscriptionOfferDetails() != null) {
+            final String offerToken = productDetails.getSubscriptionOfferDetails().get(selectedOfferIndex).getOfferToken();
+            final ImmutableList<BillingFlowParams.ProductDetailsParams> productDetailsParamsList = ImmutableList.of(
+                    BillingFlowParams.ProductDetailsParams.newBuilder()
+                            .setProductDetails(productDetails)
+                            .setOfferToken(offerToken)
+                            .build()
+            );
+
+            billingFlowParamsBuilder.setProductDetailsParamsList(productDetailsParamsList);
+        }
+        // The found [productDetails] is not a subscription model
+        else {
+            final BillingFlowParams.ProductDetailsParams productDetailsParams = BillingFlowParams.ProductDetailsParams.newBuilder()
+                    .setProductDetails(productDetails)
+                    .build();
+
+            billingFlowParamsBuilder.setProductDetailsParamsList(ImmutableList.of(productDetailsParams));
+        }
+
+        if (accountId != null && !accountId.isEmpty()) {
+            billingFlowParamsBuilder.setObfuscatedAccountId(accountId);
+        }
+        if (obfuscatedProfileId != null && !obfuscatedProfileId.isEmpty()) {
+            billingFlowParamsBuilder.setObfuscatedProfileId(obfuscatedProfileId);
+        }
+        BillingFlowParams.SubscriptionUpdateParams.Builder subscriptionUpdateParamsBuilder = BillingFlowParams.SubscriptionUpdateParams
+                .newBuilder();
+        if (oldSku != null && !oldSku.isEmpty() && purchaseToken != null) {
+            subscriptionUpdateParamsBuilder.setOldPurchaseToken(purchaseToken);
+            // The proration mode value has to match one of the following declared in
+            // https://developer.android.com/reference/com/android/billingclient/api/BillingFlowParams.ProrationMode
+            subscriptionUpdateParamsBuilder.setReplaceProrationMode(prorationMode);
+            billingFlowParamsBuilder.setSubscriptionUpdateParams(subscriptionUpdateParamsBuilder.build());
+        }
+
 
         assert billingClient != null;
         result.success(
                 Translator.fromBillingResult(
-                        billingClient.launchBillingFlow(activity, billingFlowParams)
+                        billingClient.launchBillingFlow(
+                                activity,
+                                billingFlowParamsBuilder.build()
+                        )
                 )
         );
     }
@@ -446,17 +461,6 @@ class MethodCallHandlerImpl
                         result.success(Translator.fromBillingResult(billingResult));
                     }
                 });
-    }
-
-    @Deprecated
-    private void updateCachedSkus(@Nullable List<SkuDetails> skuDetailsList) {
-        if (skuDetailsList == null) {
-            return;
-        }
-
-        for (SkuDetails skuDetails : skuDetailsList) {
-            cachedSkus.put(skuDetails.getSku(), skuDetails);
-        }
     }
 
     private void updateCachedProducts(@Nullable List<ProductDetails> productDetailsList) {
