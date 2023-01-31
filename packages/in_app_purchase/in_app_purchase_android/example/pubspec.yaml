@@ -9,16 +9,27 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  in_app_purchase_android:
+  in_app_purchase_android: ^0.2.3
     # When depending on this package from a real application you should use:
     #   in_app_purchase_android: ^x.y.z
     # See https://dart.dev/tools/pub/dependencies#version-constraints
     # The example app is bundled with the plugin so we use a path dependency on
     # the parent directory to use the current plugin's version.
-    path: ../
-  # in_app_purchase_platform_interface: ^1.0.0
-  in_app_purchase_platform_interface:
-    path: ../../in_app_purchase_platform_interface
+    # path: ../
+  # Use in package
+  in_app_purchase_platform_interface: ^1.0.0
+
+  # Use in local
+  # in_app_purchase_platform_interface:
+  #   path: ../../in_app_purchase_platform_interface
+
+  # Use in remote branch
+  # in_app_purchase_platform_interface:
+  #   git: 
+  #     url: https://github.com/seunghwanly/plugins.git
+  #     ref: feature/billing-client-5.1.0
+  #     path: packages/in_app_purchase/in_app_purchase_platform_interface
+      
   shared_preferences: ^2.0.0
 
 dev_dependencies:
