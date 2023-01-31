@@ -26,6 +26,7 @@ import java.util.Locale;
  * Handles serialization of {@link com.android.billingclient.api.BillingClient} related objects.
  */
 /*package*/ class Translator {
+    @Deprecated
     static HashMap<String, Object> fromSkuDetail(SkuDetails detail) {
         HashMap<String, Object> info = new HashMap<>();
         info.put("title", detail.getTitle());
@@ -47,6 +48,7 @@ import java.util.Locale;
         return info;
     }
 
+    @Deprecated
     static List<HashMap<String, Object>> fromSkuDetailsList(
             @Nullable List<SkuDetails> skuDetailsList) {
         if (skuDetailsList == null) {
@@ -68,11 +70,13 @@ import java.util.Locale;
         info.put("productType", detail.getProductType());
         info.put("title", detail.getTitle());
 
-        final HashMap<String, Object> oneTimePurchaseInfo = new HashMap<>();
-        oneTimePurchaseInfo.put("formattedPrice", detail.getOneTimePurchaseOfferDetails().getFormattedPrice());
-        oneTimePurchaseInfo.put("priceAmountMicros", detail.getOneTimePurchaseOfferDetails().getPriceAmountMicros());
-        oneTimePurchaseInfo.put("priceCurrencyCode", detail.getOneTimePurchaseOfferDetails().getPriceCurrencyCode());
-        info.put("oneTimePurchaseOfferDetails", oneTimePurchaseInfo);
+        if (detail.getOneTimePurchaseOfferDetails() != null) {
+            final HashMap<String, Object> oneTimePurchaseInfo = new HashMap<>();
+            oneTimePurchaseInfo.put("formattedPrice", detail.getOneTimePurchaseOfferDetails().getFormattedPrice());
+            oneTimePurchaseInfo.put("priceAmountMicros", detail.getOneTimePurchaseOfferDetails().getPriceAmountMicros());
+            oneTimePurchaseInfo.put("priceCurrencyCode", detail.getOneTimePurchaseOfferDetails().getPriceCurrencyCode());
+            info.put("oneTimePurchaseOfferDetails", oneTimePurchaseInfo);
+        }
 
         if (detail.getSubscriptionOfferDetails() != null) {
             final List<HashMap<String, Object>> subscriptionInfo = new ArrayList<>();

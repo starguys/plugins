@@ -15,7 +15,7 @@ import static io.flutter.plugins.inapppurchase.InAppPurchasePlugin.MethodNames.O
 import static io.flutter.plugins.inapppurchase.InAppPurchasePlugin.MethodNames.ON_PURCHASES_UPDATED;
 import static io.flutter.plugins.inapppurchase.InAppPurchasePlugin.MethodNames.QUERY_PURCHASES_ASYNC;
 import static io.flutter.plugins.inapppurchase.InAppPurchasePlugin.MethodNames.QUERY_PURCHASE_HISTORY_ASYNC;
-import static io.flutter.plugins.inapppurchase.InAppPurchasePlugin.MethodNames.QUERY_SKU_DETAILS;
+import static io.flutter.plugins.inapppurchase.InAppPurchasePlugin.MethodNames.QUERY_PRODUCT_DETAILS;
 import static io.flutter.plugins.inapppurchase.InAppPurchasePlugin.MethodNames.START_CONNECTION;
 import static io.flutter.plugins.inapppurchase.Translator.fromBillingResult;
 import static io.flutter.plugins.inapppurchase.Translator.fromPurchaseHistoryRecordList;
@@ -223,7 +223,7 @@ public class MethodCallHandlerTest {
     HashMap<String, Object> arguments = new HashMap<>();
     arguments.put("skuType", skuType);
     arguments.put("skusList", skusList);
-    MethodCall queryCall = new MethodCall(QUERY_SKU_DETAILS, arguments);
+    MethodCall queryCall = new MethodCall(QUERY_PRODUCT_DETAILS, arguments);
 
     // Query for SKU details
     methodChannelHandler.onMethodCall(queryCall, result);
@@ -262,7 +262,7 @@ public class MethodCallHandlerTest {
     HashMap<String, Object> arguments = new HashMap<>();
     arguments.put("skuType", skuType);
     arguments.put("skusList", skusList);
-    MethodCall queryCall = new MethodCall(QUERY_SKU_DETAILS, arguments);
+    MethodCall queryCall = new MethodCall(QUERY_PRODUCT_DETAILS, arguments);
 
     // Query for SKU details
     methodChannelHandler.onMethodCall(queryCall, result);
@@ -950,7 +950,7 @@ public class MethodCallHandlerTest {
     String skuType = SkuType.INAPP;
     arguments.put("skuType", skuType);
     arguments.put("skusList", skusList);
-    MethodCall queryCall = new MethodCall(QUERY_SKU_DETAILS, arguments);
+    MethodCall queryCall = new MethodCall(QUERY_PRODUCT_DETAILS, arguments);
 
     // Call the method.
     methodChannelHandler.onMethodCall(queryCall, mock(Result.class));

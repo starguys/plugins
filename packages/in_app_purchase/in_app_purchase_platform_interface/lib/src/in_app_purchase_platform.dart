@@ -108,6 +108,16 @@ abstract class InAppPurchasePlatform extends PlatformInterface {
   Future<bool> buyNonConsumable({required PurchaseParam purchaseParam}) =>
       throw UnimplementedError('buyNonConsumable() has not been implemented.');
 
+  /// Buy a non consumable product or subscription
+  ///
+  /// Subscriptions will have different [offerToken] in each base plans
+  Future<bool> buyNonConsumableInAndroid({
+    required PurchaseParam purchaseParam,
+    required int selectedIndex,
+  }) =>
+      throw UnimplementedError(
+          'buyNonConsumableInAndroid() has not been implemented.');
+
   /// Buy a consumable product.
   ///
   /// Consumable items can be "consumed" to mark that they've been used and then

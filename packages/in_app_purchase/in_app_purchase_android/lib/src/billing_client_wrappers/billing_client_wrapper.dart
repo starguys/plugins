@@ -204,17 +204,19 @@ class BillingClient {
   /// The [prorationMode](https://developer.android.com/reference/com/android/billingclient/api/BillingFlowParams.Builder#setreplaceskusprorationmode) is the mode of proration during subscription upgrade/downgrade.
   /// This value will only be effective if the `oldSku` is also set.
   Future<BillingResultWrapper> launchBillingFlow(
-      {required String sku,
+      {required String productId,
+      required int selectedOfferIndex,
       String? accountId,
       String? obfuscatedProfileId,
       String? oldSku,
       String? purchaseToken,
       ProrationMode? prorationMode}) async {
-    assert(sku != null);
+    assert(productId != null);
     assert((oldSku == null) == (purchaseToken == null),
         'oldSku and purchaseToken must both be set, or both be null.');
     final Map<String, dynamic> arguments = <String, dynamic>{
-      'sku': sku,
+      'productId': productId,
+      'selectedOfferIndex': selectedOfferIndex,
       'accountId': accountId,
       'obfuscatedProfileId': obfuscatedProfileId,
       'oldSku': oldSku,

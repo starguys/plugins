@@ -118,6 +118,18 @@ class InAppPurchase implements InAppPurchasePlatformAdditionProvider {
         purchaseParam: purchaseParam,
       );
 
+  /// Buy a non consumable product or subscription
+  ///
+  /// Non-renewable product will have different [PricingPhases]
+  Future<bool> buyNonConsumableInAndroid({
+    required PurchaseParam purchaseParam,
+    required int selectedIndex,
+  }) =>
+      InAppPurchasePlatform.instance.buyNonConsumableInAndroid(
+        purchaseParam: purchaseParam,
+        selectedIndex: selectedIndex,
+      );
+
   /// Buy a consumable product.
   ///
   /// Consumable items can be "consumed" to mark that they've been used and then

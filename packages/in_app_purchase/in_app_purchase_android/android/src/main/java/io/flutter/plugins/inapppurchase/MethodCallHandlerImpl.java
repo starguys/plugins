@@ -27,7 +27,6 @@ import com.android.billingclient.api.ConsumeParams;
 import com.android.billingclient.api.ConsumeResponseListener;
 import com.android.billingclient.api.PriceChangeFlowParams;
 import com.android.billingclient.api.ProductDetails;
-import com.android.billingclient.api.ProductDetailsResponseListener;
 import com.android.billingclient.api.Purchase;
 import com.android.billingclient.api.PurchaseHistoryRecord;
 import com.android.billingclient.api.PurchaseHistoryResponseListener;
@@ -36,6 +35,8 @@ import com.android.billingclient.api.QueryProductDetailsParams;
 import com.android.billingclient.api.QueryPurchaseHistoryParams;
 import com.android.billingclient.api.QueryPurchasesParams;
 import com.android.billingclient.api.SkuDetails;
+
+import com.google.common.collect.ImmutableList;
 
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
@@ -64,6 +65,7 @@ class MethodCallHandlerImpl
     private final MethodChannel methodChannel;
 
     private HashMap<String, SkuDetails> cachedSkus = new HashMap<>();
+    private final HashMap<String, ProductDetails> cachedProducts = new HashMap<>();
 
     /**
      * Constructs the MethodCallHandlerImpl
@@ -136,13 +138,14 @@ class MethodCallHandlerImpl
             case InAppPurchasePlugin.MethodNames.END_CONNECTION:
                 endConnection(result);
                 break;
-            case InAppPurchasePlugin.MethodNames.QUERY_SKU_DETAILS:
+            case InAppPurchasePlugin.MethodNames.QUERY_PRODUCT_DETAILS:
                 List<String> skusList = call.argument("skusList");
                 queryProductDetailsAsync((String) call.argument("skuType"), skusList, result);
                 break;
             case InAppPurchasePlugin.MethodNames.LAUNCH_BILLING_FLOW:
                 launchBillingFlow(
-                        (String) call.argument("sku"),
+                        (String) call.argument("productId"),
+                        (int) call.argument("selectedOfferIndex"),
                         (String) call.argument("accountId"),
                         (String) call.argument("obfuscatedProfileId"),
                         (String) call.argument("oldSku"),
@@ -211,8 +214,7 @@ class MethodCallHandlerImpl
         }
 
         final List<QueryProductDetailsParams.Product> productList = new ArrayList<>();
-        for (int i = 0; i < skusList.size(); ++i) {
-            final String productId = skusList.get(i);
+        for (final String productId : skusList) {
             productList.add(
                     QueryProductDetailsParams.Product.newBuilder()
                             .setProductId(productId)
@@ -227,12 +229,12 @@ class MethodCallHandlerImpl
                 )
                 .build();
 
-//        SkuDetailsParams params = SkuDetailsParams.newBuilder().setType(skuType).setSkusList(skusList).build();
         assert billingClient != null;
         billingClient.queryProductDetailsAsync(
                 queryProductDetailsParams,
                 (billingResult, productDetailsList) -> {
-                    // TODO [updateCachedSkus]
+                    Log.d("queryProductDetails", "billingClient: " + billingResult.toString() + " productDetails" + productDetailsList.toString());
+                    updateCachedProducts(productDetailsList);
                     final Map<String, Object> productDetailsResponse = new HashMap<>();
                     productDetailsResponse.put("billingResult", fromBillingResult(billingResult));
                     productDetailsResponse.put("productDetailsList", fromProductDetailsList(productDetailsList));
@@ -242,7 +244,8 @@ class MethodCallHandlerImpl
     }
 
     private void launchBillingFlow(
-            String sku,
+            String productId,
+            int selectedOfferIndex,
             @Nullable String accountId,
             @Nullable String obfuscatedProfileId,
             @Nullable String oldSku,
@@ -252,13 +255,13 @@ class MethodCallHandlerImpl
         if (billingClientError(result)) {
             return;
         }
-        SkuDetails skuDetails = cachedSkus.get(sku);
-        if (skuDetails == null) {
+        ProductDetails productDetails = cachedProducts.get(productId);
+        if (productDetails == null) {
             result.error(
                     "NOT_FOUND",
                     String.format(
-                            "Details for sku %s are not available. It might because skus were not fetched prior to the call. Please fetch the skus first. An example of how to fetch the skus could be found here: %s",
-                            sku, LOAD_SKU_DOC_URL),
+                            "Details for productId %s are not available. It might because skus were not fetched prior to the call. Please fetch the skus first. An example of how to fetch the skus could be found here: %s",
+                            productId, LOAD_SKU_DOC_URL),
                     null);
             return;
         }
@@ -274,7 +277,7 @@ class MethodCallHandlerImpl
             result.error(
                     "IN_APP_PURCHASE_INVALID_OLD_SKU",
                     String.format(
-                            "Details for sku %s are not available. It might because skus were not fetched prior to the call. Please fetch the skus first. An example of how to fetch the skus could be found here: %s",
+                            "Details for productId %s are not available. It might because skus were not fetched prior to the call. Please fetch the skus first. An example of how to fetch the skus could be found here: %s",
                             oldSku, LOAD_SKU_DOC_URL),
                     null);
             return;
@@ -283,32 +286,46 @@ class MethodCallHandlerImpl
         if (activity == null) {
             result.error(
                     "ACTIVITY_UNAVAILABLE",
-                    "Details for sku "
-                            + sku
+                    "Details for productId "
+                            + productId
                             + " are not available. This method must be run with the app in foreground.",
                     null);
             return;
         }
 
-        BillingFlowParams.Builder paramsBuilder = BillingFlowParams.newBuilder().setSkuDetails(skuDetails);
-        if (accountId != null && !accountId.isEmpty()) {
-            paramsBuilder.setObfuscatedAccountId(accountId);
-        }
-        if (obfuscatedProfileId != null && !obfuscatedProfileId.isEmpty()) {
-            paramsBuilder.setObfuscatedProfileId(obfuscatedProfileId);
-        }
-        BillingFlowParams.SubscriptionUpdateParams.Builder subscriptionUpdateParamsBuilder = BillingFlowParams.SubscriptionUpdateParams
-                .newBuilder();
-        if (oldSku != null && !oldSku.isEmpty() && purchaseToken != null) {
-            subscriptionUpdateParamsBuilder.setOldPurchaseToken(purchaseToken);
-            // The proration mode value has to match one of the following declared in
-            // https://developer.android.com/reference/com/android/billingclient/api/BillingFlowParams.ProrationMode
-            subscriptionUpdateParamsBuilder.setReplaceProrationMode(prorationMode);
-            paramsBuilder.setSubscriptionUpdateParams(subscriptionUpdateParamsBuilder.build());
-        }
+//        if (accountId != null && !accountId.isEmpty()) {
+//            paramsBuilder.setObfuscatedAccountId(accountId);
+//        }
+//        if (obfuscatedProfileId != null && !obfuscatedProfileId.isEmpty()) {
+//            paramsBuilder.setObfuscatedProfileId(obfuscatedProfileId);
+//        }
+//        BillingFlowParams.SubscriptionUpdateParams.Builder subscriptionUpdateParamsBuilder = BillingFlowParams.SubscriptionUpdateParams
+//                .newBuilder();
+//        if (oldSku != null && !oldSku.isEmpty() && purchaseToken != null) {
+//            subscriptionUpdateParamsBuilder.setOldPurchaseToken(purchaseToken);
+//            // The proration mode value has to match one of the following declared in
+//            // https://developer.android.com/reference/com/android/billingclient/api/BillingFlowParams.ProrationMode
+//            subscriptionUpdateParamsBuilder.setReplaceProrationMode(prorationMode);
+//            paramsBuilder.setSubscriptionUpdateParams(subscriptionUpdateParamsBuilder.build());
+//        }
+        assert !(productDetails.getSubscriptionOfferDetails().isEmpty());
+        final String offerToken = productDetails.getSubscriptionOfferDetails().get(selectedOfferIndex).getOfferToken();
+        final ImmutableList<BillingFlowParams.ProductDetailsParams> productDetailsParamsList = ImmutableList.of(
+                BillingFlowParams.ProductDetailsParams.newBuilder()
+                        .setProductDetails(productDetails)
+                        .setOfferToken(offerToken)
+                        .build()
+        );
+        final BillingFlowParams billingFlowParams = BillingFlowParams.newBuilder()
+                .setProductDetailsParamsList(productDetailsParamsList)
+                .build();
+
+        assert billingClient != null;
         result.success(
                 Translator.fromBillingResult(
-                        billingClient.launchBillingFlow(activity, paramsBuilder.build())));
+                        billingClient.launchBillingFlow(activity, billingFlowParams)
+                )
+        );
     }
 
     private void consumeAsync(String purchaseToken, final MethodChannel.Result result) {
@@ -431,7 +448,7 @@ class MethodCallHandlerImpl
                 });
     }
 
-    // TODO migrate to [ProductDetails]
+    @Deprecated
     private void updateCachedSkus(@Nullable List<SkuDetails> skuDetailsList) {
         if (skuDetailsList == null) {
             return;
@@ -439,6 +456,16 @@ class MethodCallHandlerImpl
 
         for (SkuDetails skuDetails : skuDetailsList) {
             cachedSkus.put(skuDetails.getSku(), skuDetails);
+        }
+    }
+
+    private void updateCachedProducts(@Nullable List<ProductDetails> productDetailsList) {
+        if (productDetailsList == null) {
+            return;
+        }
+
+        for (final ProductDetails productDetails : productDetailsList) {
+            cachedProducts.put(productDetails.getProductId(), productDetails);
         }
     }
 

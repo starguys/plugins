@@ -196,9 +196,11 @@ void main() {
       const String accountId = 'hashedAccountId';
       const String profileId = 'hashedProfileId';
 
+      /// Assume that user has bought the first base plan
       expect(
           await billingClient.launchBillingFlow(
-            sku: productDetails.productId,
+            productId: productDetails.productId,
+            selectedOfferIndex: 0,
             accountId: accountId,
             obfuscatedProfileId: profileId,
           ),
@@ -206,7 +208,7 @@ void main() {
       final Map<dynamic, dynamic> arguments = stubPlatform
           .previousCallMatching(launchMethodName)
           .arguments as Map<dynamic, dynamic>;
-      expect(arguments['sku'], equals(productDetails.productId));
+      expect(arguments['productId'], equals(productDetails.productId));
       expect(arguments['accountId'], equals(accountId));
       expect(arguments['obfuscatedProfileId'], equals(profileId));
     });
@@ -226,21 +228,28 @@ void main() {
       const String accountId = 'hashedAccountId';
       const String profileId = 'hashedProfileId';
 
+      /// Assume that user has bought the first base plan
       expect(
-          billingClient.launchBillingFlow(
-              sku: productDetails.productId,
-              accountId: accountId,
-              obfuscatedProfileId: profileId,
-              oldSku: dummyOldPurchase.sku),
-          throwsAssertionError);
+        billingClient.launchBillingFlow(
+          productId: productDetails.productId,
+          selectedOfferIndex: 0,
+          accountId: accountId,
+          obfuscatedProfileId: profileId,
+          oldSku: dummyOldPurchase.sku,
+        ),
+        throwsAssertionError,
+      );
 
+      /// Assume that user has bought the first base plan
       expect(
-          billingClient.launchBillingFlow(
-              sku: productDetails.productId,
-              accountId: accountId,
-              obfuscatedProfileId: profileId,
-              purchaseToken: dummyOldPurchase.purchaseToken),
-          throwsAssertionError);
+        billingClient.launchBillingFlow(
+            productId: productDetails.productId,
+            selectedOfferIndex: 0,
+            accountId: accountId,
+            obfuscatedProfileId: profileId,
+            purchaseToken: dummyOldPurchase.purchaseToken),
+        throwsAssertionError,
+      );
     });
 
     test(
@@ -258,18 +267,22 @@ void main() {
       const String accountId = 'hashedAccountId';
       const String profileId = 'hashedProfileId';
 
+      /// Assume that user has bought the first base plan
       expect(
-          await billingClient.launchBillingFlow(
-              sku: productDetails.productId,
-              accountId: accountId,
-              obfuscatedProfileId: profileId,
-              oldSku: dummyOldPurchase.sku,
-              purchaseToken: dummyOldPurchase.purchaseToken),
-          equals(expectedBillingResult));
+        await billingClient.launchBillingFlow(
+          productId: productDetails.productId,
+          selectedOfferIndex: 0,
+          accountId: accountId,
+          obfuscatedProfileId: profileId,
+          oldSku: dummyOldPurchase.sku,
+          purchaseToken: dummyOldPurchase.purchaseToken,
+        ),
+        equals(expectedBillingResult),
+      );
       final Map<dynamic, dynamic> arguments = stubPlatform
           .previousCallMatching(launchMethodName)
           .arguments as Map<dynamic, dynamic>;
-      expect(arguments['sku'], equals(productDetails.productId));
+      expect(arguments['productId'], equals(productDetails.productId));
       expect(arguments['accountId'], equals(accountId));
       expect(arguments['oldSku'], equals(dummyOldPurchase.sku));
       expect(
@@ -294,19 +307,23 @@ void main() {
       const ProrationMode prorationMode =
           ProrationMode.immediateAndChargeProratedPrice;
 
+      /// Assume that user has bought the first base plan
       expect(
-          await billingClient.launchBillingFlow(
-              sku: productDetails.productId,
-              accountId: accountId,
-              obfuscatedProfileId: profileId,
-              oldSku: dummyOldPurchase.sku,
-              prorationMode: prorationMode,
-              purchaseToken: dummyOldPurchase.purchaseToken),
-          equals(expectedBillingResult));
+        await billingClient.launchBillingFlow(
+          productId: productDetails.productId,
+          selectedOfferIndex: 0,
+          accountId: accountId,
+          obfuscatedProfileId: profileId,
+          oldSku: dummyOldPurchase.sku,
+          prorationMode: prorationMode,
+          purchaseToken: dummyOldPurchase.purchaseToken,
+        ),
+        equals(expectedBillingResult),
+      );
       final Map<dynamic, dynamic> arguments = stubPlatform
           .previousCallMatching(launchMethodName)
           .arguments as Map<dynamic, dynamic>;
-      expect(arguments['sku'], equals(productDetails.productId));
+      expect(arguments['productId'], equals(productDetails.productId));
       expect(arguments['accountId'], equals(accountId));
       expect(arguments['oldSku'], equals(dummyOldPurchase.sku));
       expect(arguments['obfuscatedProfileId'], equals(profileId));
@@ -333,19 +350,23 @@ void main() {
       const ProrationMode prorationMode =
           ProrationMode.immediateAndChargeFullPrice;
 
+      /// Assume that user has bought the first base plan
       expect(
-          await billingClient.launchBillingFlow(
-              sku: productDetails.productId,
-              accountId: accountId,
-              obfuscatedProfileId: profileId,
-              oldSku: dummyOldPurchase.sku,
-              prorationMode: prorationMode,
-              purchaseToken: dummyOldPurchase.purchaseToken),
-          equals(expectedBillingResult));
+        await billingClient.launchBillingFlow(
+          productId: productDetails.productId,
+          selectedOfferIndex: 0,
+          accountId: accountId,
+          obfuscatedProfileId: profileId,
+          oldSku: dummyOldPurchase.sku,
+          prorationMode: prorationMode,
+          purchaseToken: dummyOldPurchase.purchaseToken,
+        ),
+        equals(expectedBillingResult),
+      );
       final Map<dynamic, dynamic> arguments = stubPlatform
           .previousCallMatching(launchMethodName)
           .arguments as Map<dynamic, dynamic>;
-      expect(arguments['sku'], equals(productDetails.productId));
+      expect(arguments['productId'], equals(productDetails.productId));
       expect(arguments['accountId'], equals(accountId));
       expect(arguments['oldSku'], equals(dummyOldPurchase.sku));
       expect(arguments['obfuscatedProfileId'], equals(profileId));
@@ -366,13 +387,18 @@ void main() {
       );
       const ProductDetailsWrapper productDetails = dummyProductDetails;
 
+      /// Assume that user has bought the first base plan
       expect(
-          await billingClient.launchBillingFlow(sku: productDetails.productId),
-          equals(expectedBillingResult));
+        await billingClient.launchBillingFlow(
+          productId: productDetails.productId,
+          selectedOfferIndex: 0,
+        ),
+        equals(expectedBillingResult),
+      );
       final Map<dynamic, dynamic> arguments = stubPlatform
           .previousCallMatching(launchMethodName)
           .arguments as Map<dynamic, dynamic>;
-      expect(arguments['sku'], equals(productDetails.productId));
+      expect(arguments['productId'], equals(productDetails.productId));
       expect(arguments['accountId'], isNull);
     });
 
@@ -381,11 +407,17 @@ void main() {
         name: launchMethodName,
       );
       const ProductDetailsWrapper productDetails = dummyProductDetails;
+
+      /// Assume that user has bought the first base plan
       expect(
-          await billingClient.launchBillingFlow(sku: productDetails.productId),
-          equals(const BillingResultWrapper(
+        await billingClient.launchBillingFlow(
+            productId: productDetails.productId, selectedOfferIndex: 0),
+        equals(
+          const BillingResultWrapper(
               responseCode: BillingResponse.error,
-              debugMessage: kInvalidBillingResultErrorMessage)));
+              debugMessage: kInvalidBillingResultErrorMessage),
+        ),
+      );
     });
   });
 

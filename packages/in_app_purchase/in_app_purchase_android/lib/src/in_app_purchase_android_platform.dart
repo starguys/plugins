@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -10,7 +11,6 @@ import 'package:in_app_purchase_platform_interface/in_app_purchase_platform_inte
 
 import '../billing_client_wrappers.dart';
 import '../in_app_purchase_android.dart';
-import 'billing_client_wrappers/product_details_wrapper.dart';
 
 /// [IAPError.code] code for failed purchases.
 const String kPurchaseErrorCode = 'purchase_error';
@@ -128,6 +128,8 @@ class InAppPurchaseAndroidPlatform extends InAppPurchasePlatform {
         ),
       ];
     }
+    log(responses.last.billingResult.toString());
+    log(responses.last.productDetailsList.toString());
     final List<ProductDetails> productDetailsList =
         responses.expand((ProductDetailsResponseWrapper response) {
       return response.productDetailsList;
@@ -158,8 +160,11 @@ class InAppPurchaseAndroidPlatform extends InAppPurchasePlatform {
                 details: exception.details));
   }
 
+  @Deprecated('Use `buyNonConsumableInAndroid`')
   @override
-  Future<bool> buyNonConsumable({required PurchaseParam purchaseParam}) async {
+  Future<bool> buyNonConsumable({
+    required PurchaseParam purchaseParam,
+  }) async {
     ChangeSubscriptionParam? changeSubscriptionParam;
 
     if (purchaseParam is GooglePlayPurchaseParam) {
@@ -168,12 +173,37 @@ class InAppPurchaseAndroidPlatform extends InAppPurchasePlatform {
 
     final BillingResultWrapper billingResultWrapper =
         await billingClient.launchBillingFlow(
-            sku: purchaseParam.productDetails.id,
+            productId: purchaseParam.productDetails.id,
+            selectedOfferIndex: 0,
             accountId: purchaseParam.applicationUserName,
             oldSku: changeSubscriptionParam?.oldPurchaseDetails.productID,
             purchaseToken: changeSubscriptionParam
                 ?.oldPurchaseDetails.verificationData.serverVerificationData,
             prorationMode: changeSubscriptionParam?.prorationMode);
+    return billingResultWrapper.responseCode == BillingResponse.ok;
+  }
+
+  @override
+  Future<bool> buyNonConsumableInAndroid({
+    required PurchaseParam purchaseParam,
+    required int selectedIndex,
+  }) async {
+    ChangeSubscriptionParam? changeSubscriptionParam;
+
+    if (purchaseParam is GooglePlayPurchaseParam) {
+      changeSubscriptionParam = purchaseParam.changeSubscriptionParam;
+    }
+
+    final BillingResultWrapper billingResultWrapper =
+        await billingClient.launchBillingFlow(
+      productId: purchaseParam.productDetails.id,
+      selectedOfferIndex: selectedIndex,
+      accountId: purchaseParam.applicationUserName,
+      oldSku: changeSubscriptionParam?.oldPurchaseDetails.productID,
+      purchaseToken: changeSubscriptionParam
+          ?.oldPurchaseDetails.verificationData.serverVerificationData,
+      prorationMode: changeSubscriptionParam?.prorationMode,
+    );
     return billingResultWrapper.responseCode == BillingResponse.ok;
   }
 
