@@ -38,7 +38,7 @@ class GooglePlayProductDetails extends ProductDetails {
   ) {
     return GooglePlayProductDetails(
       id: productDetails.productId,
-      title: productDetails.title,
+      title: productDetails.name,
       description: productDetails.description,
       price: productDetails.price ?? 'unknown',
       rawPrice:
