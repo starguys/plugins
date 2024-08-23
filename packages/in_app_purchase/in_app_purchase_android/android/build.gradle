@@ -8,7 +8,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.3.1'
+        classpath 'com.android.tools.build:gradle:8.5.1'
     }
 }
 
@@ -22,17 +22,25 @@ rootProject.allprojects {
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 31
+    buildFeatures {
+        buildConfig true
+    }
+
+    // Conditional for compatibility with AGP <4.2.
+    if (project.android.hasProperty("namespace")) {
+        namespace 'io.flutter.plugins.inapppurchase'
+    }
+    
+    compileSdk 34
 
     defaultConfig {
-        minSdkVersion 16
+        minSdk 19
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     lintOptions {
-        // TODO(stuartmorgan): Enable when gradle is updated.
-        // disable 'AndroidGradlePluginVersion'
-        disable 'InvalidPackage'
-        disable 'GradleDependency'
+        checkAllWarnings true
+        warningsAsErrors true
+        disable 'AndroidGradlePluginVersion', 'InvalidPackage', 'GradleDependency', 'NewerVersionAvailable'
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -54,13 +62,13 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.annotation:annotation:1.3.0'
-    implementation 'com.android.billingclient:billing:5.1.0'
+    implementation 'androidx.annotation:annotation:1.8.2'
+    implementation 'com.android.billingclient:billing:6.2.0'
     testImplementation 'junit:junit:4.13.2'
-    testImplementation 'org.json:json:20220924'
-    testImplementation 'org.mockito:mockito-core:4.7.0'
-    androidTestImplementation 'androidx.test:runner:1.4.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
-
-    implementation 'com.google.guava:guava:31.1-android'
+    testImplementation 'org.json:json:20240303'
+    testImplementation 'org.mockito:mockito-core:5.4.0'
+    testImplementation 'androidx.test:core:1.5.0'
+    testImplementation 'org.robolectric:robolectric:4.10.3'
+    androidTestImplementation 'androidx.test:runner:1.5.2'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
 }
